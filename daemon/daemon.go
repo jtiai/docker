@@ -325,7 +325,9 @@ func (daemon *Daemon) restore() error {
 			}
 
 			if err := daemon.register(container, false); err != nil {
-				logrus.Debugf("Failed to register container %s: %s", container.ID, err)
+				logrus.Errorf("Failed to register container %s: %s", container.ID, err)
+				// The container register failed should not be started.
+				return
 			}
 
 			// check the restart policy on the containers and restart any container with
@@ -334,7 +336,7 @@ func (daemon *Daemon) restore() error {
 				logrus.Debugf("Starting container %s", container.ID)
 
 				if err := container.Start(); err != nil {
-					logrus.Debugf("Failed to start container %s: %s", container.ID, err)
+					logrus.Errorf("Failed to start container %s: %s", container.ID, err)
 				}
 			}
 		}(c.container, c.registered)
