@@ -209,14 +209,6 @@ func (daemon *Daemon) register(container *Container, updateSuffixarray bool) err
 	// we'll waste time if we update it for every container
 	daemon.idIndex.Add(container.ID)
 
-	if err := daemon.verifyVolumesInfo(container); err != nil {
-		return err
-	}
-
-	if err := container.prepareMountPoints(); err != nil {
-		return err
-	}
-
 	if container.IsRunning() {
 		logrus.Debugf("killing old running container %s", container.ID)
 
@@ -234,6 +226,14 @@ func (daemon *Daemon) register(container *Container, updateSuffixarray bool) err
 		if err := container.ToDisk(); err != nil {
 			logrus.Debugf("saving stopped state to disk %s", err)
 		}
+	}
+
+	if err := daemon.verifyVolumesInfo(container); err != nil {
+		return err
+	}
+
+	if err := container.prepareMountPoints(); err != nil {
+		return err
 	}
 
 	return nil
